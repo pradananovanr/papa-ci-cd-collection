@@ -19,6 +19,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: pradananovanr/papa-ci-cd-collection
+          ref: master
           path: .github/ci-cd-collection
 
       - name: Set up Docker Buildx
