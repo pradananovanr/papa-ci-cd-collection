@@ -10,6 +10,9 @@ jobs:
   pipeline:
     name: Build & Deploy Pipeline
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout caller repository
