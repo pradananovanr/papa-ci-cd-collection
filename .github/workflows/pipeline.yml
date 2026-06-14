@@ -1,0 +1,60 @@
+name: Centralized CI/CD Pipeline
+
+on:
+  workflow_call:
+    secrets:
+      DOKPLOY_WEBHOOK_URL:
+        required: false
+
+jobs:
+  pipeline:
+    name: Execute Centralized Pipeline
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout caller repository
+        uses: actions/checkout@v4
+
+      - name: Checkout CI/CD collection repository
+        uses: actions/checkout@v4
+        with:
+          repository: pradananovanr/papa-ci-cd-collection
+          path: .github/ci-cd-collection
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Execute Branch or Default CI Script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOKPLOY_WEBHOOK_URL: ${{ secrets.DOKPLOY_WEBHOOK_URL }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_ACTOR: ${{ github.actor }}
+        run: |
+          REPO_NAME="${{ github.event.repository.name }}"
+          if [ -z "$REPO_NAME" ]; then
+            REPO_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2)
+          fi
+          
+          BRANCH_NAME="${{ github.ref_name }}"
+          COLLECTION_DIR=".github/ci-cd-collection"
+          
+          # 1. Try to find branch-specific script: e.g., <repo>/main-ci.sh
+          SCRIPT_PATH="$COLLECTION_DIR/$REPO_NAME/${BRANCH_NAME}-ci.sh"
+          
+          # 2. Fallback to generic script: e.g., <repo>/ci.sh
+          if [ ! -f "$SCRIPT_PATH" ]; then
+            SCRIPT_PATH="$COLLECTION_DIR/$REPO_NAME/ci.sh"
+          fi
+          
+          if [ -f "$SCRIPT_PATH" ]; then
+            echo "Executing CI script: $SCRIPT_PATH"
+            chmod +x "$SCRIPT_PATH"
+            ./$SCRIPT_PATH
+          else
+            echo "Error: CI script not found for $REPO_NAME (tried ${BRANCH_NAME}-ci.sh and ci.sh)"
+            exit 1
+          fi
