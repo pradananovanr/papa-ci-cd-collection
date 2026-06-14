@@ -1,0 +1,21 @@
+{
+  "docker": {
+    "image_name": "papa-shortener",
+    "registry": "ghcr.io",
+    "registry_image": "ghcr.io/pradananovanr/papa-shortener",
+    "dockerfile": "Dockerfile",
+    "context": ".",
+    "build_args": []
+  },
+  "health_check": {
+    "enabled": false,
+    "port_mapping": "8181:8080",
+    "container_name": "test-shortener",
+    "url": "http://localhost:8181/health",
+    "env": []
+  },
+  "deployment": {
+    "enabled": true,
+    "trigger_webhook": true
+  }
+}

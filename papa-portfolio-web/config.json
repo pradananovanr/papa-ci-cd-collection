@@ -1,0 +1,21 @@
+{
+  "docker": {
+    "image_name": "papa-portfolio",
+    "registry": "ghcr.io",
+    "registry_image": "ghcr.io/pradananovanr/papa-portfolio",
+    "dockerfile": "Dockerfile",
+    "context": ".",
+    "build_args": []
+  },
+  "health_check": {
+    "enabled": true,
+    "port_mapping": "8888:8080",
+    "container_name": "test-portfolio",
+    "url": "http://localhost:8888",
+    "env": []
+  },
+  "deployment": {
+    "enabled": true,
+    "trigger_webhook": true
+  }
+}
