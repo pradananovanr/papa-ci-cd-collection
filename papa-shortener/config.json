@@ -16,6 +16,7 @@
   },
   "deployment": {
     "enabled": true,
-    "trigger_webhook": true
+    "trigger_webhook": true,
+    "branch": "master"
   }
 }
